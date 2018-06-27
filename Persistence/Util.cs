@@ -6,16 +6,16 @@ using System.Data.SqlClient;
 namespace org.commitworld.web.persistence
 {
 
-    public class SqlParameterBuilder
+    public class SqlParamsBuilder
     {
         private List<SqlParameter> paramsCollection = new List<SqlParameter>();
 
-        public SqlParameterBuilder AddInputParameter(string name, SqlDbType type, object value)
+        public SqlParamsBuilder AddInputParameter(string name, SqlDbType type, object value)
         {
             return AddParameter(name, type, value, ParameterDirection.Input);
         }
 
-        public SqlParameterBuilder AddParameter(string name, SqlDbType type, object value, ParameterDirection direction)
+        public SqlParamsBuilder AddParameter(string name, SqlDbType type, object value, ParameterDirection direction)
         {
             SqlParameter parameter = new SqlParameter()
             {
@@ -26,6 +26,11 @@ namespace org.commitworld.web.persistence
             };
             paramsCollection.Add(parameter);
             return this;
+        }
+
+        public List<SqlParameter> Build()
+        {
+            return paramsCollection;
         }
 
     }
