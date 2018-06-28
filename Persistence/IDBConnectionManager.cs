@@ -7,34 +7,87 @@ using System.Text;
 
 namespace org.commitworld.web.persistence
 {
+    /// <summary>
+    /// Models an SQL executor
+    /// </summary>
     public interface IDBConnectionManager
     {
+        /// <summary>
+        /// Executes a prepared statement and gets a DataTable as the result
+        /// </summary>
+        /// <param name="query">The prepared statement</param>
+        /// <param name="sqlParams">The list of parameter. <see cref="SqlParamsBuilder"/> can be useful to build this list</param>
+        /// <param name="transactional">Indicates whether or not to open a new transaction</param>
+        /// <returns>The result data as a DataTable</returns>
         DataTable GetDataFromQuery(string query, ICollection<SqlParameter> sqlParams = null, bool transactional = false);
+
+        /// <summary>
+        /// Executes a prepared statement with scalar result and gets it as an integer
+        /// </summary>
+        /// <param name="query">The prepared statement</param>
+        /// <param name="sqlParams">The list of parameter. <see cref="SqlParamsBuilder"/> can be useful to build this list</param>
+        /// <param name="transactional"></param>
+        /// <returns>The integer result of the scalar query</returns>
         Int32 ExecuteScalarParam(string query, ICollection<SqlParameter> sqlParams = null, bool transactional = false);
+        /// <summary>
+        /// Performs bulk of a set of data into a destination table
+        /// </summary>
+        /// <param name="table">The set of source data</param>
+        /// <param name="destTable">The destination table</param>
+        /// <returns>True if the bulk operation was successfully executed, False otherwise</returns>
         bool SqlBulk(DataTable table, string destTable);
     }
 
+    /// <summary>
+    /// Args of <see cref="DBManager"/> events
+    /// </summary>
     public class DBManagerEventArgs : EventArgs
     {
+        /// <summary>
+        /// The SQL prepared statement that was just executed
+        /// </summary>
         public string Command { get; set; }
+        /// <summary>
+        /// The result of the query execution
+        /// </summary>
         public object Result { get; set; }
+        /// <summary>
+        /// The eventual exception that was risen due to any kind of problems
+        /// </summary>
         public Exception Error { get; set; }
     }
 
+    /// <summary>
+    /// Abstract implementation of <see cref="IDBConnectionManager"/>  
+    /// It also manages DB access and events notification, delegating them to subclasses to reach customization. 
+    /// So, you should extend this class to get a concrete DB manager
+    /// </summary>
     public abstract class DBManager : IDBConnectionManager
     {
         public event EventHandler<DBManagerEventArgs> QueryCompleted, Error;
 
+        /// <summary>
+        /// Notifies a query execution has completed successfully
+        /// </summary>
+        /// <param name="e">The event args</param>
         protected void OnQueryCompleted(DBManagerEventArgs e)
         {
             if (QueryCompleted != null) QueryCompleted(this, e);
         }
 
+        /// <summary>
+        /// Notifies a query execution has completed with errors
+        /// </summary>
+        /// <param name="e">The event args</param>
         protected void OnError(DBManagerEventArgs e)
         {
             if (Error != null) Error(this, e);
         }
 
+        /// <summary>
+        /// Opens a new SQL connection
+        /// </summary>
+        /// <returns>The new SQl connection</returns>
         private SqlConnection OpenNewConnection()
         {
             SqlConnection sqlConnection = new SqlConnection(ConnectionString);
@@ -42,11 +95,17 @@ namespace org.commitworld.web.persistence
             return sqlConnection;
         }
 
+        /// <summary>
+        /// Gets the connection string
+        /// </summary>
         protected abstract string ConnectionString
         {
             get;
         }
 
+        /// <summary>
+        /// Gets the connection timeout
+        /// </summary>
         protected abstract int ConnectionTimeout
         {
             get;

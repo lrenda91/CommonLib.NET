@@ -14,6 +14,12 @@ namespace org.commitworld.web.persistence
     internal class InterceptorUtil
     {
         private InterceptorUtil() { }
+
+        /// <summary>
+        /// Builds the name-value map of parameters of an invocation
+        /// </summary>
+        /// <param name="invocation">The invocation data</param>
+        /// <returns>The parameters dictionary</returns>
         internal static IDictionary<string, object> GetParamsMap(MethodBase method, object[] args)
         {
             ParameterInfo[] myParameters = method.GetParameters();
@@ -25,6 +31,12 @@ namespace org.commitworld.web.persistence
             return parameters;
         }
 
+        /// <summary>
+        /// Registers interceptors on each method of a target DAO instance before and after execution, and even if exceptions occurs
+        /// </summary>
+        /// <typeparam name="TInterface">The interface implemented by the target DAO instance</typeparam>
+        /// <param name="target">The target DAO instance</param>
+        /// <returns>A new <typeparamref name="TInterface"/> instance, with method interception</returns>
         internal static TInterface GetWrappedInstance<TInterface>(DAO target)
         {
             ProxyFactory factory = new ProxyFactory(target);
@@ -34,9 +46,12 @@ namespace org.commitworld.web.persistence
             return (TInterface)factory.GetProxy();
         }
     }
+
+    /// <summary>
+    /// Intercepts DAO method calls by substituting real method
+    /// </summary>
     public class DaoInterceptor : IMethodInterceptor
     {
-
         public object Invoke(IMethodInvocation invocation)
         {
             object result = null;
@@ -58,14 +73,21 @@ namespace org.commitworld.web.persistence
         }
     }
 
+    /// <summary>
+    /// Intercetps DAO methods BEFORE they are executed
+    /// </summary>
     public class BeforeAdvice : IMethodBeforeAdvice
     {
 
         public void Before(MethodInfo method, object[] args, object target)
         {
-            Console.WriteLine("prima");
+            
         }
     }
+
+    /// <summary>
+    /// Intercetps DAO methods AFTER they are executed
+    /// </summary>
     public class AfterAdvice : IAfterReturningAdvice
     {
         public void AfterReturning(object returnValue, MethodInfo method, object[] args, object target)
