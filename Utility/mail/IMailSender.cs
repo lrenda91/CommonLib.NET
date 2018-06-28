@@ -11,7 +11,8 @@ namespace org.commitworld.web.utility.mail
         void SendMail(
             MailParams config, 
             ICollection<string> to, 
-            ICollection<string> cc, 
+            ICollection<string> cc,
+            ICollection<string> bcc, 
             string subject, 
             string body,
             ICollection<MailAttachment> attachments

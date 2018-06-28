@@ -33,6 +33,7 @@ namespace org.commitworld.web.utility.mail
         public void SendMail(MailParams config,
             ICollection<string> tos,
             ICollection<string> ccs,
+            ICollection<string> bccs, 
             string subject,
             string body,
             ICollection<MailAttachment> attachments)
@@ -54,6 +55,13 @@ namespace org.commitworld.web.utility.mail
                     foreach (string cc in ccs)
                     {
                         message.CC.Add(cc);
+                    }
+                }
+                if (bccs != null)
+                {
+                    foreach (string bcc in bccs)
+                    {
+                        message.Bcc.Add(bcc);
                     }
                 }
 
