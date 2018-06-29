@@ -146,7 +146,7 @@ namespace org.commitworld.web.persistence
         }
 
         /// <summary>
-        /// Creates a <see cref="DAO"/> instance from the specified query loader and executor. 
+        /// Creates a <typeparamref name="TClass"/> instance from the specified query loader and executor. 
         /// The implemented interface and the target subclass of <see cref="DAO"/> also implementing the interface are provided as generic arguments
         /// </summary>
         /// <typeparam name="TInterface">The base interface the DAO must implement</typeparam>

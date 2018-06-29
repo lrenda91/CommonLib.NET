@@ -99,7 +99,7 @@ namespace org.commitworld.web.persistence
     {
         public void AfterReturning(object returnValue, MethodInfo method, object[] args, object target)
         {
-            
+
         }
     }
 
