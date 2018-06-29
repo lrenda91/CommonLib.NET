@@ -22,13 +22,16 @@ namespace org.commitworld.web.persistence
         /// <returns>The parameters dictionary</returns>
         internal static IDictionary<string, object> GetParamsMap(MethodBase method, object[] args)
         {
+            var dict = new Dictionary<string, object>();
             ParameterInfo[] myParameters = method.GetParameters();
-            var parameters = new Dictionary<string, object>();
-            for (int i = 0; i < args.Length; i++)
+            if (args != null)
             {
-                parameters.Add(myParameters[i].Name, args[i]);
+                for (int i = 0; i < args.Length; i++)
+                {
+                    dict.Add(myParameters[i].Name, args[i]);
+                }
             }
-            return parameters;
+            return dict;
         }
 
         /// <summary>
