@@ -88,8 +88,9 @@ namespace org.commitworld.web.persistence
         /// <typeparam name="TInterface">The base interface the DAO must implement</typeparam>
         /// <param name="dbMngr">The db executor to assign to the DAO instance</param>
         /// <param name="qL">The query loader to assign to the DAO instance</param>
-        /// <returns>The DAO instance</returns>
-        public static TInterface CreateInstance<TInterface>(IDBConnectionManager dbMngr, IQueryLoader qL)
+        /// <param name="proxy">The proxy object that intercepts target instance methods</param>
+        /// <returns>The DAO target instance</returns>
+        public static DAO CreateInstance<TInterface>(IDBConnectionManager dbMngr, IQueryLoader qL, out TInterface proxy)
         {
             var DaoInterfaceType = typeof(TInterface);
             if (!DaoInterfaceType.IsInterface)
@@ -138,8 +139,10 @@ namespace org.commitworld.web.persistence
             DAO target = (DAO)Activator.CreateInstance(subclassType);
             target.DBConnectionManager = dbMngr;
             target.SqlQueryLoader = qL;
+
+            proxy = InterceptorUtil.GetWrappedInstance<TInterface>(target);
             
-            return InterceptorUtil.GetWrappedInstance<TInterface>(target);
+            return target;
         }
 
         /// <summary>
@@ -150,14 +153,17 @@ namespace org.commitworld.web.persistence
         /// <typeparam name="TClass">The concrete class to instantiate</typeparam>
         /// <param name="dbMngr">The db executor to assign to the DAO instance</param>
         /// <param name="qL">The query loader to assign to the DAO instance</param>
-        /// <returns>The DAO instance</returns>
-        public static TInterface CreateInstance<TInterface, TClass>(IDBConnectionManager dbMngr, IQueryLoader qL) where TClass : DAO, TInterface
+        /// <param name="proxy">The proxy object that intercepts target instance methods</param>
+        /// <returns>The <typeparamref name="TClass"/> target instance</returns>
+        public static TClass CreateInstance<TInterface, TClass>(IDBConnectionManager dbMngr, IQueryLoader qL, out TInterface proxy) where TClass : DAO, TInterface
         {
-            DAO target = (DAO)Activator.CreateInstance(typeof(TClass), new object[] { });
+            TClass target = (TClass)Activator.CreateInstance(typeof(TClass));
             target.DBConnectionManager = dbMngr;
             target.SqlQueryLoader = qL;
 
-            return InterceptorUtil.GetWrappedInstance<TInterface>(target);
+            proxy = InterceptorUtil.GetWrappedInstance<TInterface>(target);
+
+            return target;
         }
 
 

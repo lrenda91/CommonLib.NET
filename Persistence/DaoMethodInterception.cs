@@ -44,8 +44,6 @@ namespace org.commitworld.web.persistence
         {
             ProxyFactory factory = new ProxyFactory(target);
             factory.AddAdvice(new DaoInterceptor());
-            factory.AddAdvice(new AfterAdvice());
-            factory.AddAdvice(new BeforeAdvice());
             return (TInterface)factory.GetProxy();
         }
     }
@@ -62,6 +60,12 @@ namespace org.commitworld.web.persistence
             try
             {
                 result = invocation.Proceed();
+
+                dao.OnDone(new DAOEventArgs()
+                {
+                    Input = InterceptorUtil.GetParamsMap(invocation.Method, invocation.Arguments),
+                    Result = result
+                });
             }
             catch (Exception ex)
             {
@@ -95,12 +99,7 @@ namespace org.commitworld.web.persistence
     {
         public void AfterReturning(object returnValue, MethodInfo method, object[] args, object target)
         {
-            DAO dao = (DAO)target;
-            dao.OnDone(new DAOEventArgs()
-            {
-                Input = InterceptorUtil.GetParamsMap(method, args),
-                Result = returnValue
-            });
+            
         }
     }
 
