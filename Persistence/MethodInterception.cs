@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AopAlliance.Intercept;
 using Spring.Aop;
 using Spring.Aop.Framework;
+using System.Transactions;
 
 namespace org.commitworld.web.persistence
 {
@@ -51,7 +52,7 @@ namespace org.commitworld.web.persistence
     /// <summary>
     /// Intercepts DAO method calls by substituting real method
     /// </summary>
-    public class DaoInterceptor : IMethodInterceptor
+    class DaoInterceptor : IMethodInterceptor
     {
         public object Invoke(IMethodInvocation invocation)
         {
@@ -80,26 +81,24 @@ namespace org.commitworld.web.persistence
         }
     }
 
-    /// <summary>
-    /// Intercetps DAO methods BEFORE they are executed
-    /// </summary>
-    public class BeforeAdvice : IMethodBeforeAdvice
+    class TransactionScopeAdvice : IMethodInterceptor
     {
-
-        public void Before(MethodInfo method, object[] args, object target)
+        public object Invoke(IMethodInvocation invocation)
         {
-            
-        }
-    }
-
-    /// <summary>
-    /// Intercetps DAO methods AFTER they are executed
-    /// </summary>
-    public class AfterAdvice : IAfterReturningAdvice
-    {
-        public void AfterReturning(object returnValue, MethodInfo method, object[] args, object target)
-        {
-
+            object result = null;
+            try
+            {
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    result = invocation.Proceed();
+                    scope.Complete();
+                }
+            }
+            catch (TransactionAbortedException)
+            {
+                
+            }
+            return result;
         }
     }
 
